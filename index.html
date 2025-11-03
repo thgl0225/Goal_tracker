@@ -8,10 +8,10 @@
         /* 변수 설정 - 강조 색상에 따라 동적으로 변경될 변수 정의 */
         :root {
             --accent-color: #e91e63;
-            /* **수정:** light-accent-color, very-light-color, hover-color는 JS에서 동적으로 HSL을 기반으로 생성 */
             --light-accent-color: #ff80ab; 
             --very-light-color: #f8bbd0;
             --hover-color: #fce4ec;
+            --separator-color: #f0f0f0; /* 2. **추가:** 구분선 전용 색상 */
             --widget-background: rgba(255, 255, 255, 0.9);
             --text-color: #333;
         }
@@ -41,14 +41,15 @@
             padding: 15px;
             width: 100%;
             max-width: 280px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: none; 
             border: 1px solid var(--very-light-color);
             position: relative;
         }
 
         /* 습관 목록 상단 (오늘 날짜 표시) */
         .today-header {
-            font-size: 10px;
+            /* 4. **수정:** 오늘 날짜 폰트 크기 확대 */
+            font-size: 12px; 
             color: var(--accent-color);
             text-align: center;
             margin-bottom: 10px;
@@ -73,7 +74,9 @@
             border-radius: 8px;
             margin-bottom: 4px;
             transition: background 0.3s;
-            border-bottom: 1px solid var(--hover-color); 
+            /* 1. **수정:** 구분선 실선으로 변경 */
+            /* 2. **수정:** 구분선 색상 변경 (가독성 향상) */
+            border-bottom: 1px solid var(--separator-color); 
             
             padding-left: 8px; 
             padding-right: 8px; 
@@ -95,7 +98,6 @@
         .checkbox {
             width: 16px;
             height: 16px;
-            /* **수정:** 테두리 색상 조정 */
             border: 2px solid var(--very-light-color); 
             border-radius: 50%;
             cursor: pointer;
@@ -108,17 +110,22 @@
             margin-right: 8px; 
         }
         .checkbox.checked {
-            /* **수정:** 그라데이션 제거, 단색으로 변경 */
             background: var(--accent-color);
             border-color: var(--accent-color);
         }
+        
+        /* 체크박스 체크표시 디자인 - 직선적인 'ㄴ' 모양 */
         .checkbox.checked::after {
-            content: '✓';
-            color: white; 
-            font-size: 10px; 
-            font-weight: bold;
+            content: '';
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0; 
+            transform: rotate(45deg) translate(-1px, 0px); 
+            display: block;
+            margin-top: -1px; 
         }
-
+        
         /* 편집 가능 영역 */
         .habit-editable-area {
             display: flex;
@@ -181,7 +188,7 @@
             color: var(--accent-color); 
         }
         
-        /* 진행률 섹션 디자인 (세련되게 변경) */
+        /* 진행률 섹션 디자인 */
         .progress-section {
             margin-top: 10px; 
             padding-top: 0px; 
@@ -210,7 +217,6 @@
         .progress-bar {
             height: 100%;
             width: 0%;
-            /* **수정:** 그라데이션 제거, 단색으로 변경 */
             background: var(--accent-color);
             transition: width 0.5s ease-out;
             border-radius: 5px; 
@@ -387,7 +393,6 @@
 
         /* 요일 선택 버튼 - 선택된 상태 */
         .day-selection-group button.selected {
-            /* **수정:** 그라데이션 제거, 단색으로 변경 */
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
@@ -405,7 +410,6 @@
         #saveHabitBtn {
             width: 100%;
             padding: 8px;
-            /* **수정:** 그라데이션 제거, 단색으로 변경 */
             background: var(--accent-color);
             color: white;
             border: none;
@@ -422,7 +426,7 @@
             box-shadow: 0 -4px 8px rgba(255, 255, 255, 0.9); 
         }
         #saveHabitBtn:hover {
-            background: var(--light-accent-color); /* 호버 시 약간 연한 색으로 변경 */
+            background: var(--light-accent-color); 
         }
         
         /* 습관 초기화 팝업창 디자인 */
@@ -447,7 +451,6 @@
             margin-bottom: 12px;
         }
         .confirm-modal-buttons button {
-            /* **수정:** 그라데이션 제거, 단색으로 변경 */
             background: var(--accent-color);
             color: white;
             border: none;
@@ -459,7 +462,7 @@
             transition: background 0.2s;
         }
         .confirm-modal-buttons .confirm-yes:hover {
-            background: var(--light-accent-color); /* 호버 시 약간 연한 색으로 변경 */
+            background: var(--light-accent-color); 
         }
         .confirm-modal-buttons .confirm-no {
             background: #ccc;
@@ -539,9 +542,16 @@
 
     <script>
         // --- 데이터 구조 및 로컬 스토리지 관리 ---
-        const DEFAULT_HABITS = [];
+        // 3. **수정:** 기본 습관을 빈 배열로 유지
+        const DEFAULT_HABITS = []; 
         
-        let habits = JSON.parse(localStorage.getItem('habits')) || DEFAULT_HABITS;
+        let habits = JSON.parse(localStorage.getItem('habits'));
+        // 3. **수정:** 로컬 스토리지에 데이터가 없거나 비어 있을 때만 빈 배열로 초기화
+        if (habits === null || habits === undefined) { 
+            habits = DEFAULT_HABITS;
+            localStorage.setItem('habits', JSON.stringify(habits)); // 초기에 빈 배열로 저장
+        }
+        
         let nextId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
         let history = JSON.parse(localStorage.getItem('habitHistory')) || {}; 
         let currentHabitId = null;
@@ -568,8 +578,9 @@
             localStorage.setItem('habitHistory', JSON.stringify(history));
         }
 
-        // --- 색상 동적 변경 로직 (HSL을 이용한 명도 조절로 그라데이션 대신 연한 색 생성) ---
+        // --- 색상 동적 변경 로직 (HSL을 이용한 명도 조절) ---
         const hexToHsl = (H) => { 
+            // ... (hexToHsl 함수는 그대로 유지)
             var r = 0, g = 0, b = 0;
             if (H.length == 4) {
                 r = parseInt(H[1]+H[1], 16);
@@ -601,6 +612,7 @@
             return [h * 360, s * 100, l * 100];
         };
         const hslToHex = (h, s, l) => { 
+            // ... (hslToHex 함수는 그대로 유지)
             h /= 360;
             s /= 100;
             l /= 100;
@@ -639,7 +651,6 @@
         function changeAccentColor(newColor) {
             const [h, s, l] = hexToHsl(newColor);
             
-            // **수정:** 명도(lightness)만 조절하여 연한 색상을 생성
             // lightAccent: 명도 +20% (최대 100)
             const lightAccent = hslToHex(h, s, Math.min(100, l + 20)); 
             
@@ -649,10 +660,14 @@
             // hoverColor: 명도 +50% (최대 100)
             const hoverColor = hslToHex(h, s, Math.min(100, l + 50)); 
             
+            // 2. **수정:** 구분선 색상: 명도 95%로 설정하여 배경색과 구분되도록 함 (최대 밝은 색)
+            const separatorColor = hslToHex(h, s, 95); 
+            
             document.documentElement.style.setProperty('--accent-color', newColor);
             document.documentElement.style.setProperty('--light-accent-color', lightAccent);
             document.documentElement.style.setProperty('--very-light-color', veryLightColor); 
             document.documentElement.style.setProperty('--hover-color', hoverColor); 
+            document.documentElement.style.setProperty('--separator-color', separatorColor); // 구분선 색상 적용
 
             localStorage.setItem('accentColor', newColor);
             updateColorIcon(newColor); 
@@ -663,7 +678,7 @@
 
         function sortHabits(habits) {
             const todayChecks = history[TODAY_KEY] || {};
-
+            // ... (sortHabits 함수는 그대로 유지)
             return habits.sort((a, b) => {
                 const getPriority = (habit) => {
                     const freq = habit.frequency;
@@ -777,6 +792,7 @@
             updateProgress();
             saveState();
         }
+        // ... (이하 함수들 toggleHabit, updateProgress, toggleFrequencyOptions, setupDaySelector, openEditHabitModal, openAddHabitModal, closeHabitFormModal, saveHabit, confirmDelete, openConfirmModal, closeConfirmModal, alert는 변경 없이 유지)
 
         function toggleHabit(id) {
             const habit = habits.find(h => h.id === id);
@@ -814,9 +830,7 @@
             }, 0);
             document.getElementById('progressText').textContent = `오늘 달성률: ${percentage}% (${checkedItems}/${totalDueItems})`;
         }
-
-        // --- 습관 추가/편집 모달 로직 ---
-
+        
         let selectedDays = [];
         function toggleFrequencyOptions() {
             const frequency = document.querySelector('#habitFormModal #frequencySelect').value;
@@ -960,8 +974,6 @@
             });
         }
         
-        // --- 모달 및 유틸리티 ---
-        
         let pendingAction = null;
         function openConfirmModal(message, actionCallback) {
             document.getElementById('confirmMessage').textContent = message.replace(/<br>/g, ''); 
@@ -987,6 +999,7 @@
             const savedColor = localStorage.getItem('accentColor') || colorPicker.value;
             colorPicker.value = savedColor;
             
+            // 초기 색상 설정 및 변수 업데이트
             changeAccentColor(savedColor); 
 
             colorPicker.addEventListener('input', (e) => {
