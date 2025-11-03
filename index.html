@@ -10,7 +10,7 @@
             --accent-color: #e91e63;
             --light-accent-color: #ff80ab;
             --very-light-color: #f8bbd0;
-            --hover-color: #f9eef1;
+            --hover-color: #fce4ec; /* 테마 색상 기반의 옅은 배경색 */
             --widget-background: rgba(255, 255, 255, 0.9);
             --text-color: #333;
         }
@@ -52,13 +52,15 @@
             text-align: center;
             margin-bottom: 10px;
             font-weight: 600;
-            cursor: pointer;
+            /* 2. 오늘날짜 눌러도 아무 일 없도록 커서 default */
+            cursor: default; 
             padding: 5px;
             border-radius: 6px;
             transition: background 0.2s;
         }
         .today-header:hover {
-            background: var(--hover-color);
+            /* 2. hover 색상 제거 (클릭 기능이 없어졌으므로) */
+            background: transparent; 
             color: var(--accent-color);
         }
 
@@ -66,12 +68,21 @@
         .habit-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-between; 
             padding: 4px 0;
             background: transparent;
             border-radius: 8px;
             margin-bottom: 4px;
             transition: background 0.3s;
+            border-bottom: 1px solid var(--hover-color); 
+            
+            padding-left: 8px; 
+            padding-right: 8px; 
+            margin-left: -8px; 
+            margin-right: -8px; 
+        }
+        .habit-item:last-child {
+            border-bottom: none; 
         }
         .habit-item:hover {
             background: var(--hover-color);
@@ -81,13 +92,38 @@
             pointer-events: none;
         }
 
+        /* 체크 표시 디자인 */
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--very-light-color);
+            border-radius: 50%;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background-color: white; 
+            margin-right: 8px; 
+        }
+        .checkbox.checked {
+            background: linear-gradient(135deg, var(--light-accent-color) 0%, var(--accent-color) 100%);
+            border-color: var(--accent-color);
+        }
+        .checkbox.checked::after {
+            content: '✓';
+            color: white; 
+            font-size: 10px; 
+            font-weight: bold;
+        }
+
         /* 편집 가능 영역 */
         .habit-editable-area {
             display: flex;
             align-items: center;
             flex: 1;
-            padding: 4px;
-            margin: 0 4px; 
+            padding: 4px 0; 
             cursor: pointer; 
             min-width: 0; 
         }
@@ -116,41 +152,16 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        /* 습관 주기 정보 */
+        
         .habit-frequency {
             font-size: 9px;
             color: #999;
         }
 
-        /* 체크 표시 디자인 */
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--very-light-color);
-            border-radius: 50%;
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            background-color: white; 
-        }
-        .checkbox.checked {
-            background: linear-gradient(135deg, var(--light-accent-color) 0%, var(--accent-color) 100%);
-            border-color: var(--accent-color);
-        }
-        .checkbox.checked::after {
-            content: '✓';
-            color: white; 
-            font-size: 12px;
-            font-weight: bold;
-        }
-
         /* 삭제 버튼 */
         .delete-btn {
             background: transparent;
-            color: var(--very-light-color);
+            color: rgba(255, 0, 0, 0.4); 
             border: none;
             font-size: 12px;
             cursor: pointer;
@@ -160,12 +171,13 @@
             opacity: 0;
             z-index: 1;
             flex-shrink: 0;
+            margin-left: 5px; 
         }
         .habit-item:hover .delete-btn {
             opacity: 1;
         }
         .delete-btn:hover {
-            color: var(--accent-color);
+            color: var(--accent-color); 
         }
         
         /* 진행률 섹션 디자인 */
@@ -189,13 +201,12 @@
         }
         .progress-text {
             font-size: 10px;
-            color: var(--text-color);
+            color: var(--accent-color); 
             text-align: center;
-            font-weight: 500;
+            font-weight: 600; 
         }
 
         /* 설정 버튼 영역 */
-        /* 3. 하단 3개 버튼 사이 간격 조정(좁게) */
         .settings-btn-area {
             text-align: right;
             margin-top: 8px;
@@ -203,7 +214,7 @@
             border-top: 1px solid var(--very-light-color); 
             display: flex; 
             justify-content: flex-end; 
-            gap: 3px; /* 좁게 조정 */
+            gap: 2px; 
         }
         .action-btn {
             background: transparent;
@@ -251,18 +262,18 @@
 
         /* 모달 공통 스타일 */
         .modal {
+            /* 1. 모달이 컨테이너 크기 늘 일정 크기 유지하도록 수정 */
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100%; /* 부모 컨테이너(max-width 280px)를 가득 채움 */
             background: rgba(255, 255, 255, 0.95);
             border-radius: 18px;
             display: none;
             flex-direction: column;
             padding: 15px;
             z-index: 10;
-            overflow-y: auto;
         }
         .modal.open {
             display: flex;
@@ -282,38 +293,6 @@
             font-weight: 600;
         }
         
-        /* 캘린더 모달 헤더 */
-        #calendarModal .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        #calendarMonthYear {
-            font-size: 11px;
-            font-weight: 600; 
-            color: var(--accent-color);
-            flex-grow: 1; 
-            text-align: center;
-        }
-        #calendarModal .modal-header button {
-            background: transparent;
-            border: none;
-            color: var(--light-accent-color);
-            font-size: 14px;
-            cursor: pointer;
-            padding: 5px;
-            transition: color 0.2s;
-        }
-        #calendarModal .modal-header button:hover {
-            color: var(--accent-color);
-        }
-        #calendarModal .modal-header .close-btn {
-            font-size: 18px; 
-            color: var(--text-color);
-            margin-left: 10px; 
-        }
-        
         .close-btn {
             background: transparent;
             border: none;
@@ -330,10 +309,16 @@
             flex-shrink: 0;
         }
         
-        /* 1. 습관 추가/편집 모달 레이아웃 수정 */
+        /* 습관 추가/편집 모달 내용 영역 */
+        #habitFormModal .modal-content {
+            flex-grow: 1;
+            overflow-y: auto; 
+            padding-bottom: 10px; 
+        }
+        
         .modal-setting-group {
             margin-bottom: 12px;
-            padding: 8px 10px; /* 사각테두리 크기 조정 (좌우 패딩 축소) */
+            padding: 8px 10px; 
             border: 1px solid var(--very-light-color); 
             border-radius: 10px;
         }
@@ -341,8 +326,8 @@
             font-size: 10px; 
             font-weight: 600;
             color: var(--text-color);
-            padding-left: 5px; /* 들여쓰기 적용 */
-            display: block; /* 들여쓰기 적용을 위해 block 요소로 변경 */
+            padding-left: 5px; 
+            display: block; 
         }
         #habitFormModal input[type="text"], 
         #habitFormModal select,
@@ -366,36 +351,45 @@
             font-size: 10px;
             margin-top: 8px;
         }
-
-        /* 요일 선택 버튼 디자인 */
+        
+        /* 요일 선택 버튼 그룹 */
         .day-selection-group {
             display: flex;
             justify-content: space-between;
             gap: 4px;
             margin-top: 8px;
         }
+
+        /* 요일 선택 버튼 디자인 */
         .day-selection-group button {
-            flex-grow: 1;
-            padding: 4px 0;
-            font-size: 9px; 
-            border: 1px solid var(--very-light-color);
-            border-radius: 6px;
-            background: #fff;
+            flex: 1;
+            padding: 6px 4px;
+            background: white;
             color: var(--text-color);
+            border: 1px solid var(--very-light-color);
+            border-radius: 8px;
+            font-size: 9px;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .day-selection-group button:hover {
-            background: var(--hover-color);
-        }
+
+        /* 요일 선택 버튼 - 선택된 상태 */
         .day-selection-group button.selected {
-            background: var(--accent-color);
+            background: var(--light-accent-color);
             color: white;
-            border-color: var(--accent-color);
+            border-color: var(--light-accent-color);
         }
-        
+        /* 토요일(6) 색상 강조 (선택되지 않았을 때) */
+        .day-selection-group button[data-day="6"]:not(.selected) {
+            color: #007bff; /* 파랑 계열 */
+        }
+        /* 일요일(0) 색상 강조 (선택되지 않았을 때) */
+        .day-selection-group button[data-day="0"]:not(.selected) {
+            color: #dc3545; /* 빨강 계열 */
+        }
+
         /* 모달 저장 버튼 */
-        .add-btn {
+        #saveHabitBtn {
             width: 100%;
             padding: 8px;
             background: var(--light-accent-color);
@@ -407,57 +401,14 @@
             cursor: pointer;
             transition: background 0.2s;
             margin-top: 10px;
+            
+            position: sticky; 
+            bottom: 0px; 
+            z-index: 11;
+            box-shadow: 0 -4px 8px rgba(255, 255, 255, 0.9); 
         }
-        .add-btn:hover {
+        #saveHabitBtn:hover {
             background: var(--accent-color);
-        }
-
-
-        /* 달력 디자인 */
-        .history-calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-            width: 100%;
-            text-align: center;
-        }
-        .weekday-label {
-            font-size: 9px;
-            color: var(--accent-color);
-            padding: 4px 0;
-            font-weight: bold;
-        }
-        .day-cell {
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            border-radius: 4px;
-            cursor: default;
-        }
-        .day-cell.current-month { 
-            background: #fff;
-            color: var(--text-color); 
-            border: 1px solid var(--very-light-color);
-        }
-        .day-cell[data-completion="full"] {
-            background: var(--accent-color);
-            color: white;
-            border: 1px solid var(--accent-color);
-        }
-        .day-cell[data-completion="partial"] {
-            background: var(--light-accent-color);
-            color: white;
-            border: 1px solid var(--light-accent-color);
-        }
-        .day-cell[data-completion="0"] {
-            background: var(--hover-color);
-            border: 1px solid var(--very-light-color);
-        }
-        .day-cell.current-today { 
-            border: 2px solid var(--accent-color); 
-            padding: 0;
         }
         
         /* 습관 초기화 팝업창 디자인 */
@@ -500,7 +451,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="today-header" id="todayDateHeader" onclick="openCalendarModal()"></div>
+        <div class="today-header" id="todayDateHeader"></div>
         
         <div id="habitList"></div>
         
@@ -513,24 +464,12 @@
 
         <div class="settings-btn-area">
             <button class="action-btn add-habit-btn" onclick="openAddHabitModal()" title="새 습관 추가">+</button>
-            <button class="action-btn reset-checks-btn" onclick="confirmReset()" title="오늘 할 일 초기화">🧹</button>
             <button class="action-btn color-change-btn" id="colorChangeBtn" title="강조 색상 변경">
                 <span id="colorIcon"></span>
                 <input type="color" id="colorPicker" value="#e91e63">
             </button>
         </div>
 
-        <div id="calendarModal" class="modal">
-            <div class="modal-header">
-                <button onclick="changeCalendarMonth(-1)">&#9664;</button>
-                <span class="calendar-nav" id="calendarMonthYear"></span>
-                <button onclick="changeCalendarMonth(1)">&#9654;</button>
-                <button class="close-btn" onclick="closeCalendarModal()">✕</button>
-            </div>
-            <div class="modal-content" id="calendarContainer">
-                </div>
-        </div>
-        
         <div id="habitFormModal" class="modal"> 
             <div class="modal-header">
                 <span class="modal-title" id="habitFormTitle">새 습관 추가</span>
@@ -551,13 +490,13 @@
                     </select>
 
                     <div id="daySelector" class="day-selection-group" style="display: none;">
-                        <button data-day="0">일</button>
                         <button data-day="1">월</button>
                         <button data-day="2">화</button>
                         <button data-day="3">수</button>
                         <button data-day="4">목</button>
                         <button data-day="5">금</button>
                         <button data-day="6">토</button>
+                        <button data-day="0">일</button>
                     </div>
                     
                     <div id="countSelector" class="input-frequency" style="display: none;">
@@ -567,7 +506,7 @@
                     </div>
                 </div>
 
-                <button id="saveHabitBtn" class="add-btn" onclick="saveHabit()">저장</button>
+                <button id="saveHabitBtn" onclick="saveHabit()">저장</button>
             </div>
         </div>
 
@@ -591,7 +530,6 @@
         let habits = JSON.parse(localStorage.getItem('habits')) || DEFAULT_HABITS;
         let nextId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
         let history = JSON.parse(localStorage.getItem('habitHistory')) || {}; 
-        let currentDate = new Date(); 
         let currentHabitId = null;
 
         const TODAY_KEY = getTodayKey(); 
@@ -605,7 +543,7 @@
         function getStartOfWeek(date) {
             const d = new Date(date);
             const day = d.getDay(); 
-            const diff = d.getDate() - day; // 일요일(0)을 주의 시작으로 설정
+            const diff = d.getDate() - day; 
             d.setDate(diff);
             d.setHours(0, 0, 0, 0);
             return d;
@@ -616,7 +554,7 @@
             localStorage.setItem('habitHistory', JSON.stringify(history));
         }
 
-        // --- 색상 동적 변경 로직 (이전 코드 유지) ---
+        // --- 색상 동적 변경 로직 ---
         const hexToHsl = (H) => { 
             var r = 0, g = 0, b = 0;
             if (H.length == 4) {
@@ -646,6 +584,7 @@
                 }
                 h /= 6;
             }
+            // HSL 값 반환
             return [h * 360, s * 100, l * 100];
         };
         const hslToHex = (h, s, l) => { 
@@ -686,9 +625,15 @@
         
         function changeAccentColor(newColor) {
             const [h, s, l] = hexToHsl(newColor);
+            
+            // lightAccent: 명도 +15 (최대 100)
             const lightAccent = hslToHex(h, s, Math.min(100, l + 15)); 
+            
+            // veryLightColor: 채도 40%로 낮추고 명도 88
             const veryLightColor = hslToHex(h, Math.min(100, s * 0.4), 88); 
-            const hoverColor = hslToHex(h, Math.min(100, s * 0.2), 95); 
+            
+            // hoverColor: 채도 10%로 대폭 낮추고 명도 96으로 높여 매우 연하게 조정
+            const hoverColor = hslToHex(h, Math.min(100, s * 0.1), 96); 
             
             document.documentElement.style.setProperty('--accent-color', newColor);
             document.documentElement.style.setProperty('--light-accent-color', lightAccent);
@@ -713,21 +658,16 @@
 
                     let basePriority = 99; 
 
-                    // 1. 매일 하는 것 (Daily)
                     if (freq === 'daily') {
                         basePriority = 10; 
-                    // 2. 요일 중 오늘이 포함된 것 (Weekly Days Due)
                     } else if (freq === 'weekly_days' && isDue) {
                         basePriority = 20; 
-                    // 3. 주 몇회 정해져 있는 것 (Weekly Count)
                     } else if (freq === 'weekly_count') {
                         basePriority = 30; 
-                    // 4. 오늘이 아닌 것 (Not Due Today) - Weekly Days Not Due
                     } else if (freq === 'weekly_days' && !isDue) {
                         basePriority = 40;
                     } 
                     
-                    // Secondary sort: Unchecked (0) before Checked (1)
                     let checkPriority = isChecked ? 1 : 0; 
 
                     return basePriority + checkPriority;
@@ -768,8 +708,15 @@
             if (habit.frequency === 'daily') return '[매일]';
             if (habit.frequency === 'weekly_days' && habit.days && habit.days.length > 0) {
                 const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-                const selectedDays = habit.days.sort().map(d => dayNames[d]).join(', ');
-                return `[주 ${habit.days.length}회: ${selectedDays}]`;
+                // 월요일부터 시작하는 순서로 정렬하여 표시
+                const sortedDays = habit.days.sort((a, b) => {
+                    // 1, 2, 3, 4, 5, 6, 0 순서로 정렬 (월-일)
+                    const normalizedA = a === 0 ? 7 : a; 
+                    const normalizedB = b === 0 ? 7 : b; 
+                    return normalizedA - normalizedB;
+                }).map(d => dayNames[d]);
+                
+                return `[주 ${habit.days.length}회: ${sortedDays.join(', ')}]`;
             }
             if (habit.frequency === 'weekly_count') {
                 return getWeeklyCountProgress(habit.id, habit.count);
@@ -855,6 +802,7 @@
         }
 
         // --- 습관 추가/편집 모달 로직 ---
+
         let selectedDays = [];
         function toggleFrequencyOptions() {
             const frequency = document.querySelector('#habitFormModal #frequencySelect').value;
@@ -997,24 +945,12 @@
                 renderHabits();
             });
         }
-
-        function confirmReset() {
-            // 2. 습관 초기화 팝업창 문구 수정
-            openConfirmModal('오늘의 모든 습관 체크를<br>해제하시겠습니까?', () => {
-                habits.filter(h => h.frequency === 'daily' || h.frequency === 'weekly_count' || (h.frequency === 'weekly_days' && isHabitDueToday(h))).forEach(habit => {
-                    history[TODAY_KEY] = history[TODAY_KEY] || {};
-                    history[TODAY_KEY][habit.id] = false;
-                });
-                renderHabits();
-            });
-        }
-
+        
         // --- 모달 및 유틸리티 ---
-        function closeCalendarModal() { document.getElementById('calendarModal').classList.remove('open'); }
         
         let pendingAction = null;
         function openConfirmModal(message, actionCallback) {
-            document.getElementById('confirmMessage').innerHTML = message; // innerHTML로 변경하여 <br> 태그 반영
+            document.getElementById('confirmMessage').textContent = message.replace(/<br>/g, ''); 
             document.getElementById('confirmModal').style.display = 'block';
             pendingAction = actionCallback;
             document.getElementById('confirmYesBtn').onclick = () => {
@@ -1028,85 +964,6 @@
         }
         function alert(message) { window.alert(message); }
         
-        // --- 달력 렌더링 함수 (이전 코드 유지) ---
-
-        function openCalendarModal() {
-            document.getElementById('calendarModal').classList.add('open');
-            currentDate = new Date();
-            renderCalendar(currentDate);
-        }
-
-        function getCompletionRate(dateKey) {
-            const record = history[dateKey];
-            if (!record) return 0;
-            const trackableHabits = habits.filter(h => h.frequency === 'daily' || h.frequency === 'weekly_days');
-            const totalHabits = trackableHabits.length; 
-            if (totalHabits === 0) return 0;
-            
-            const checkedCount = trackableHabits.filter(h => record[h.id] === true).length;
-            return checkedCount / totalHabits;
-        }
-
-        function renderCalendar(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth(); 
-            const today = new Date();
-            const todayKey = getTodayKey();
-
-            document.getElementById('calendarMonthYear').textContent = `${year}년 ${month + 1}월`;
-
-            const firstDayOfMonth = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            let calendarHTML = `
-                <div class="history-calendar">
-                    <div class="weekday-label">일</div>
-                    <div class="weekday-label">월</div>
-                    <div class="weekday-label">화</div>
-                    <div class="weekday-label">수</div>
-                    <div class="weekday-label">목</div>
-                    <div class="weekday-label">금</div>
-                    <div class="weekday-label">토</div>
-            `;
-            
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                calendarHTML += `<div class="day-cell"></div>`;
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const completionRate = getCompletionRate(dateKey); 
-
-                let completionClass = '';
-                if (completionRate === 1) {
-                    completionClass = 'full';
-                } else if (completionRate > 0) {
-                    completionClass = 'partial';
-                } else if (Object.keys(history[dateKey] || {}).length > 0) {
-                    completionClass = '0'; 
-                }
-
-                let extraClass = '';
-                if (dateKey === todayKey && year === today.getFullYear() && month === today.getMonth()) {
-                    extraClass = 'current-today';
-                }
-
-                calendarHTML += `
-                    <div class="day-cell current-month ${extraClass}" data-completion="${completionClass}" title="${day}일: ${(completionRate * 100).toFixed(0)}% 달성">
-                        ${day}
-                    </div>
-                `;
-            }
-
-            calendarHTML += `</div>`;
-            document.getElementById('calendarContainer').innerHTML = calendarHTML;
-        }
-
-        function changeCalendarMonth(offset) {
-            currentDate.setMonth(currentDate.getMonth() + offset);
-            renderCalendar(currentDate);
-        }
-
         // --- 초기 로드 ---
 
         window.onload = function() {
