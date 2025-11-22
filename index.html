@@ -3,665 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>습관 트래커</title>
+    <title>Wellness Tracker Final</title>
     <style>
-        /* 변수 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Montserrat:wght@400;500;600&display=swap');
+
         :root {
-            --accent-color: #e91e63;
-            --light-accent-color: #ff80ab; 
-            --very-light-color: #f8bbd0;
-            --hover-color: #fce4ec;
-            --separator-color: #f0f0f0; 
-            --widget-background: rgba(255, 255, 255, 0.9);
-            --text-color: #333;
+            --bg: #fffcfc;
+            --card: #ffffff;
+            --primary: #cfa4a4;
+            --primary-soft: #efe4e4;
+            --accent: #b08585;
+            --text: #6b5b5b;
+            --text-light: #a89999;
+            --danger: #e57373;
+            --success: #a4cfa4;
+            --border-radius: 16px;
         }
 
-        /* 초기화 */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* 전체 배경 및 중앙 정렬 */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: transparent; 
+            margin: 0; padding: 0;
+            font-family: 'Montserrat', 'Gowun Dodum', sans-serif;
+            background-color: transparent;
+            color: var(--text);
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            padding: 10px;
         }
 
-        /* 컨테이너 (위젯 본체) */
         .container {
-            background: var(--widget-background);
-            border-radius: 18px;
-            padding: 15px;
             width: 100%;
-            max-width: 280px;
-            box-shadow: none; 
-            /* 1. **수정:** 사각형 외곽선 제거 */
-            border: none;
-            position: relative;
-        }
-
-        /* 습관 목록 상단 (오늘 날짜 표시) */
-        .today-header {
-            font-size: 12px;
-            color: var(--accent-color);
-            text-align: center;
-            margin-bottom: 10px;
-            font-weight: 600;
-            cursor: default; 
-            padding: 5px;
-            border-radius: 6px;
-        }
-        
-        /* 2. **수정:** 습관 목록 최소 높이 설정 (빈 상태에서 공간 유지) */
-        #habitList {
-            min-height: 80px; /* 약 3~4개의 습관이 들어갈 수 있는 높이 */
-        }
-        
-        /* 습관 항목 */
-        .habit-item {
+            max-width: 100%;
+            padding: 1.5rem;
             display: flex;
-            align-items: center;
-            justify-content: space-between; 
-            padding: 4px 0; 
-            background: transparent;
-            border-radius: 8px;
-            margin-bottom: 0;
-            transition: all 0.3s ease;
-            
-            border-bottom: 1px solid var(--separator-color);
-            
-            padding-left: 8px; 
-            padding-right: 8px; 
-            margin-left: -8px; 
-            margin-right: -8px;
-            
-            cursor: grab; /* 3. 드래그 가능함을 시각적으로 표시 */
-        }
-        .habit-item:active {
-             cursor: grabbing;
-        }
-        
-        .habit-item:hover { 
-            background: var(--hover-color);
-        }
-        .habit-item.not-due { 
-            opacity: 0.5; 
-            pointer-events: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: var(--card);
         }
 
-        /* 3. **추가:** 드래그 앤 드롭 CSS */
-        .habit-item.dragging {
-            opacity: 0.5;
-            transform: scale(0.98);
-            border: 2px dashed var(--accent-color);
-            padding: 2px 8px; 
-            background: var(--hover-color);
+        /* --- Header --- */
+        header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding-bottom: 10px; border-bottom: 1px solid var(--primary-soft);
         }
-        .habit-item.drag-over {
-            box-shadow: 0 4px 0 -2px var(--accent-color) inset; /* 드롭 존 시각적 표시 */
-        }
+        .header-left h1 { font-size: 1.2rem; font-weight: 600; margin: 0; color: var(--accent); letter-spacing: -0.5px; }
+        .date { font-size: 0.8rem; color: var(--text-light); }
+        .settings-btn { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 4px; transition: 0.3s; }
+        .settings-btn:hover { color: var(--accent); transform: rotate(30deg); }
+        .settings-btn.active { color: var(--accent); transform: rotate(180deg); }
+        .edit-notice { font-size: 0.75rem; color: var(--accent); text-align: center; background: var(--primary-soft); padding: 4px; border-radius: 4px; display: none; margin-top: -10px; }
+        body.editing .edit-notice { display: block; }
 
-        /* 체크 표시 디자인 */
-        .checkbox {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--accent-color); 
-            border-radius: 50%;
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: white; 
-            margin-right: 8px; 
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .checkbox:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        .checkbox.checked { background: var(--accent-color); border-color: var(--accent-color); transform: scale(1.05); }
-        .checkbox.checked::after {
-            content: ''; width: 3px; height: 7px; border: solid white;
-            border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, 0px); 
-            display: block; margin-top: -1px;
-        }
-        
-        .habit-editable-area { display: flex; align-items: center; flex: 1; padding: 4px 0; cursor: pointer; min-width: 0; }
-        .habit-info { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-        .habit-name-group { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        /* --- Section & Icons --- */
+        .section { display: flex; flex-direction: column; gap: 0.8rem; }
+        .label { font-size: 0.85rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .icon { width: 18px; height: 18px; stroke: var(--text); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .label .icon { stroke: var(--primary); width: 16px; height: 16px; }
 
-        .habit-name { 
-            font-size: 11px; color: var(--text-color); font-weight: 600;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.01em; 
-        }
-        .habit-frequency { font-size: 9px; color: #999; }
+        /* --- Mood --- */
+        .mood-container { display: flex; justify-content: space-between; background: var(--primary-soft); padding: 10px; border-radius: var(--border-radius); }
+        .mood-btn { background: none; border: none; cursor: pointer; padding: 4px; opacity: 0.5; transition: 0.2s; }
+        .mood-btn svg { width: 28px; height: 28px; stroke: var(--text); }
+        .mood-btn.active { opacity: 1; transform: scale(1.15); }
+        .mood-btn.active svg { stroke: var(--accent); fill: rgba(255,255,255,0.5); }
 
-        /* 삭제 버튼 */
-        .delete-btn { background: transparent; color: rgba(255, 0, 0, 0.4); border: none; font-size: 12px; cursor: pointer; transition: color 0.2s, opacity 0.3s; padding: 4px; line-height: 1; opacity: 0; z-index: 1; flex-shrink: 0; margin-left: 5px; }
-        .habit-item:hover .delete-btn { opacity: 1; }
-        .delete-btn:hover { color: var(--accent-color); }
-        
-        /* 진행률 섹션 디자인 */
-        .progress-section { margin-top: 10px; padding-top: 0px; border-top: none; display: flex; flex-direction: column; align-items: center; padding-bottom: 5px; }
-        .progress-text { font-size: 10px; color: #999; font-weight: 500; margin-bottom: 4px; }
-        .progress-bar-container { height: 10px; background-color: transparent; border-radius: 5px; overflow: hidden; width: 100%; border: 1px solid var(--very-light-color); }
-        .progress-bar { height: 100%; width: 0%; background: var(--accent-color); transition: width 0.5s ease-out; border-radius: 5px; }
-        
-        /* 설정 버튼 영역 */
-        .settings-btn-area { text-align: right; margin-top: 8px; padding-top: 5px; border-top: 1px solid var(--very-light-color); display: flex; justify-content: flex-end; gap: 2px; }
-        .action-btn { background: transparent; color: var(--light-accent-color); padding: 0; font-size: 18px; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s; }
-        .action-btn:hover { color: var(--accent-color); background: var(--hover-color); }
-        
-        /* 색상 선택 버튼 */
-        #colorIcon { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 1px var(--very-light-color); pointer-events: none; }
-        .color-change-btn { padding: 8px; position: relative; }
-        .color-change-btn input[type="color"] { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            opacity: 0; cursor: pointer; z-index: 100;
+        /* --- Energy --- */
+        .battery-container { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .battery-shell { width: 100%; height: 36px; border: 2px solid var(--primary-soft); border-radius: 10px; padding: 4px; position: relative; display: flex; align-items: center; gap: 4px; }
+        .battery-shell::after { content: ''; position: absolute; right: -6px; top: 10px; bottom: 10px; width: 4px; background: var(--primary-soft); border-radius: 0 4px 4px 0; }
+        .battery-level { flex: 1; height: 100%; background: var(--primary-soft); border-radius: 4px; transition: background 0.3s ease; }
+        .battery-container[data-level="1"] .battery-level:nth-child(1) { background: var(--danger); }
+        .battery-container[data-level="2"] .battery-level:nth-child(-n+2) { background: #ffb74d; }
+        .battery-container[data-level="3"] .battery-level:nth-child(-n+3) { background: #ffd54f; }
+        .battery-container[data-level="4"] .battery-level:nth-child(-n+4) { background: #aed581; }
+        .battery-container[data-level="5"] .battery-level:nth-child(-n+5) { background: var(--success); }
+        .energy-text { font-size: 0.8rem; font-weight: 600; color: var(--accent); min-width: 40px; text-align: right; }
+
+        /* --- Sleep --- */
+        .sleep-wrapper { display: flex; align-items: center; gap: 12px; }
+        input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--primary-soft); border-radius: 10px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: var(--primary); margin-top: -6px; cursor: pointer; transition: 0.2s; }
+        .sleep-value { font-size: 0.9rem; font-weight: 600; color: var(--accent); min-width: 50px; text-align: right; }
+
+        /* --- MEALS (New Section Style) --- */
+        .meal-list { display: flex; flex-direction: column; gap: 10px; }
+        .meal-row { display: flex; align-items: center; gap: 12px; }
+        .meal-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--text-light); }
+        .meal-icon svg { width: 18px; height: 18px; stroke: var(--primary); stroke-width: 1.5; }
+        .meal-input {
+            flex: 1; border: none; border-bottom: 1px solid var(--primary-soft);
+            background: transparent; padding: 6px 0; font-family: inherit; font-size: 0.85rem; color: var(--text);
+            outline: none; transition: border-color 0.2s;
         }
-        
-        /* 모달 스타일 (생략) */
-        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); border-radius: 18px; display: none; flex-direction: column; padding: 15px; z-index: 10; }
-        .modal.open { display: flex; }
-        .modal-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .modal-title { font-size: 14px; color: var(--accent-color); font-weight: 600; }
-        .close-btn { background: transparent; border: none; color: var(--text-color); font-size: 18px; cursor: pointer; padding: 0; line-height: 1; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        #habitFormModal .modal-content { flex-grow: 1; overflow-y: auto; padding-bottom: 10px; }
-        .modal-setting-group { margin-bottom: 12px; padding: 8px 10px; border: 1px solid var(--very-light-color); border-radius: 10px; }
-        .modal-setting-group label { font-size: 10px; font-weight: 600; color: var(--text-color); padding-left: 5px; display: block; }
-        #habitFormModal input[type="text"], #habitFormModal select, #habitFormModal input[type="number"] { width: 100%; padding: 6px; border: 1px solid var(--very-light-color); border-radius: 8px; font-size: 9px; outline: none; margin-top: 4px; }
-        #habitFormModal input[type="number"] { width: 40px; text-align: center; }
-        #habitFormModal .input-frequency { display: flex; align-items: center; gap: 5px; font-size: 10px; margin-top: 8px; }
-        .day-selection-group { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
-        .day-selection-group button { flex: 1; padding: 6px 4px; background: white; color: var(--text-color); border: 1px solid var(--very-light-color); border-radius: 8px; font-size: 9px; cursor: pointer; transition: all 0.2s; }
-        .day-selection-group button.selected { background: var(--accent-color); color: white; border-color: var(--accent-color); }
-        .day-selection-group button[data-day="6"]:not(.selected) { color: #007bff; }
-        .day-selection-group button[data-day="0"]:not(.selected) { color: #dc3545; }
-        #saveHabitBtn { width: 100%; padding: 8px; background: var(--accent-color); color: white; border: none; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; position: sticky; bottom: 0px; z-index: 11; box-shadow: 0 -4px 8px rgba(255, 255, 255, 0.9); }
-        #saveHabitBtn:hover { background: var(--light-accent-color); }
-        .confirm-modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); padding: 15px; z-index: 20; text-align: center; border: 1px solid var(--very-light-color); display: none; }
-        .confirm-modal-message { font-size: 11px; color: var(--text-color); margin-bottom: 12px; }
-        .confirm-modal-buttons button { background: var(--accent-color); color: white; border: none; border-radius: 6px; padding: 5px 10px; font-size: 10px; cursor: pointer; margin: 0 4px; transition: background 0.2s; }
-        .confirm-modal-buttons .confirm-yes:hover { background: var(--light-accent-color); }
-        .confirm-modal-buttons .confirm-no { background: #ccc; color: #333; }
+        .meal-input:focus { border-bottom-color: var(--accent); }
+        .meal-input::placeholder { color: #e0d4d4; }
+
+        /* --- Water & Vitamin --- */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .tracker-box { display: flex; gap: 5px; flex-wrap: wrap; }
+        .drop-btn, .pill-btn { background: none; border: none; cursor: pointer; padding: 0; opacity: 0.3; transition: 0.2s; }
+        .drop-btn svg, .pill-btn svg { stroke: var(--primary); fill: none; width: 20px; height: 20px; }
+        .drop-btn.active, .pill-btn.active { opacity: 1; transform: scale(1.1); }
+        .drop-btn.active svg, .pill-btn.active svg { fill: var(--primary); }
+
+        /* --- Dynamic Lists --- */
+        .chip-container { display: flex; gap: 8px; flex-wrap: wrap; }
+        .chip { padding: 6px 14px; border: 1px solid var(--primary-soft); border-radius: 20px; font-size: 0.8rem; cursor: pointer; color: var(--text-light); background: transparent; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .chip:hover { border-color: var(--primary); }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 500; }
+        .chip-del { display: none; width: 14px; height: 14px; background: #fff; color: var(--danger); border-radius: 50%; font-size: 10px; line-height: 14px; text-align: center; }
+        body.editing .chip { border-style: dashed; border-color: var(--accent); color: var(--text); background: #fff !important; }
+        body.editing .chip-del { display: inline-block; }
+        .add-input-group { display: none; gap: 8px; margin-top: 4px; }
+        body.editing .add-input-group { display: flex; }
+        .add-input { flex: 1; border: none; border-bottom: 1px solid var(--text-light); background: transparent; padding: 4px; font-family: inherit; font-size: 0.85rem; outline: none; }
+        .add-btn { background: var(--primary); color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* --- Routine --- */
+        .habit-list { display: flex; flex-direction: column; gap: 8px; }
+        .habit-item { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; color: var(--text); padding: 4px 0; }
+        .custom-checkbox { width: 18px; height: 18px; border: 2px solid var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .custom-checkbox svg { width: 14px; height: 14px; stroke: white; opacity: 0; transition: 0.2s; }
+        .habit-item.active .custom-checkbox { background: var(--primary); }
+        .habit-item.active .custom-checkbox svg { opacity: 1; }
+        .habit-item.active span { color: var(--text-light); text-decoration: line-through; }
+        .habit-del { margin-left: auto; color: var(--danger); opacity: 0; pointer-events: none; background: none; border: none; cursor: pointer; }
+        .habit-del svg { width: 16px; height: 16px; stroke: var(--danger); }
+        body.editing .habit-item { border-bottom: 1px dashed var(--primary-soft); }
+        body.editing .habit-del { opacity: 1; pointer-events: auto; }
+        body.editing .habit-item span { text-decoration: none !important; color: var(--text) !important; }
+
+        /* --- Note --- */
+        textarea { width: 100%; height: 70px; border: 1px solid var(--primary-soft); background: #fafafa; border-radius: 12px; padding: 12px; font-family: inherit; font-size: 0.9rem; resize: none; outline: none; color: var(--text); }
+        textarea:focus { border-color: var(--primary); background: white; }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="today-header" id="todayDateHeader"></div>
-        <div id="habitList"></div>
-        <div class="progress-section">
-             <div class="progress-text" id="progressText">0/0</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
+
+<div class="container">
+    <header>
+        <div class="header-left">
+            <h1>WELLNESS LOG</h1>
+            <div class="date" id="dateDisplay">Loading...</div>
         </div>
-        <div class="settings-btn-area">
-            <button class="action-btn add-habit-btn" onclick="openAddHabitModal()" title="새 습관 추가">+</button>
-            <button class="action-btn color-change-btn" id="colorChangeBtn" title="강조 색상 변경">
-                <span id="colorIcon"></span>
-                <input type="color" id="colorPicker" value="#e91e63">
-            </button>
+        <button class="settings-btn" onclick="toggleEditMode()">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+    </header>
+    <div class="edit-notice">편집 모드: 항목 수정/삭제/추가 가능</div>
+
+    <div class="section">
+        <div class="label">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>MOOD
         </div>
-        <div id="habitFormModal" class="modal"> 
-            <div class="modal-header">
-                <span class="modal-title" id="habitFormTitle">새 습관 추가</span>
-                <button class="close-btn" onclick="closeHabitFormModal()">✕</button>
-            </div>
-            <div class="modal-content">
-                <div class="modal-setting-group">
-                    <label class="modal-setting-label">습관 이름</label>
-                    <input type="text" id="habitNameInput" placeholder="습관 이름 입력"> 
+        <div class="mood-container">
+             <button class="mood-btn" onclick="setMood(0)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M16 9l-2 2"></path><path d="M14 9l2 2"></path><path d="M10 9l-2 2"></path><path d="M8 9l2 2"></path><path d="M16 17c-2-2-6-2-8 0"></path></svg></button>
+            <button class="mood-btn" onclick="setMood(1)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="15" x2="16" y2="15"></line><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></button>
+            <button class="mood-btn" onclick="setMood(2)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></button>
+            <button class="mood-btn" onclick="setMood(3)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><path d="M9 9l.01 0"></path><path d="M15 9l.01 0"></path><path d="M16 9c0-.5-.5-1-1-1s-1 .5-1 1"></path><path d="M10 9c0-.5-.5-1-1-1s-1 .5-1 1"></path></svg></button>
+            <button class="mood-btn" onclick="setMood(4)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><path d="M9 9L10 9"></path><path d="M14 9L15 9"></path><path d="M7 8c1.5 0 2 1.5 2 1.5"></path><path d="M17 8c-1.5 0-2 1.5-2 1.5"></path></svg></button>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="section">
+            <div class="label"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M13 2L11 7h4L13 12"></path></svg>ENERGY</div>
+            <div class="battery-container" id="energyBattery" onclick="toggleEnergy()" data-level="3">
+                <div class="battery-shell">
+                    <div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div>
                 </div>
-                <div class="modal-setting-group">
-                    <label class="modal-setting-label">반복 주기 설정</label>
-                    <select id="frequencySelect" onchange="toggleFrequencyOptions()"> 
-                        <option value="daily">매일 반복</option>
-                        <option value="weekly_days">주간 특정 요일 반복</option>
-                        <option value="weekly_count">주간 총 횟수 반복</option>
-                    </select>
-                    <div id="daySelector" class="day-selection-group" style="display: none;">
-                        <button data-day="1">월</button>
-                        <button data-day="2">화</button>
-                        <button data-day="3">수</button>
-                        <button data-day="4">목</button>
-                        <button data-day="5">금</button>
-                        <button data-day="6">토</button>
-                        <button data-day="0">일</button>
-                    </div>
-                    <div id="countSelector" class="input-frequency" style="display: none;">
-                        <label for="weeklyCountInput">주 몇 회:</label>
-                        <input type="number" id="weeklyCountInput" min="1" max="7" value="3">
-                        <label>회</label>
-                    </div>
-                </div>
-                <button id="saveHabitBtn" onclick="saveHabit()">저장</button>
             </div>
         </div>
-        <div id="confirmModal" class="confirm-modal">
-            <div class="confirm-modal-message" id="confirmMessage"></div>
-            <div class="confirm-modal-buttons">
-                <button class="confirm-yes" id="confirmYesBtn">확인</button>
-                <button class="confirm-no" onclick="closeConfirmModal()">취소</button>
+        <div class="section">
+            <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>SLEEP</div>
+            <div class="sleep-wrapper">
+                <input type="range" min="0" max="12" step="0.5" id="sleepRange" oninput="updateSleep(this.value)">
+                <div class="sleep-value"><span id="sleepVal">7</span>h</div>
             </div>
         </div>
     </div>
-    <script>
-        const DEFAULT_HABITS = [];
-        let habits = JSON.parse(localStorage.getItem('habits'));
-        if (habits === null || habits === undefined) { 
-            habits = DEFAULT_HABITS; 
-            localStorage.setItem('habits', JSON.stringify(habits));
-        }
-        let nextId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
-        let history = JSON.parse(localStorage.getItem('habitHistory')) || {}; 
-        let currentHabitId = null;
-        const TODAY_KEY = getTodayKey(); 
-        const TODAY_DAY = new Date().getDay();
-        function getTodayKey() { 
-            const now = new Date();
-            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
-        }
-        function getStartOfWeek(date) { 
-            const d = new Date(date);
-            const day = d.getDay(); 
-            const diff = d.getDate() - day; 
-            d.setDate(diff); 
-            d.setHours(0, 0, 0, 0); 
-            return d;
-        }
-        function saveState() { 
-            localStorage.setItem('habits', JSON.stringify(habits)); 
-            localStorage.setItem('habitHistory', JSON.stringify(history));
-        }
 
-        const hexToHsl = (H) => { 
-            var r = 0, g = 0, b = 0;
-            if (H.length == 4) {
-                r = parseInt(H[1]+H[1], 16); g = parseInt(H[2]+H[2], 16); b = parseInt(H[3]+H[3], 16);
-            } else if (H.length == 7) {
-                r = parseInt(H[1]+H[2], 16); g = parseInt(H[3]+H[4], 16); b = parseInt(H[5]+H[6], 16);
+    <div class="section">
+        <div class="label">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+            MEALS
+        </div>
+        <div class="meal-list">
+            <div class="meal-row">
+                <div class="meal-icon" title="Morning"><svg viewBox="0 0 24 24"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.91 11.63c1.23.63 2.09 1.92 2.09 3.37 0 2.21-1.79 4-4 4s-4-1.79-4-4c0-1.45.86-2.74 2.09-3.37"></path><path d="M9 12H7l-2 3h5"></path><path d="M12 12v-2"></path></svg></div>
+                <input type="text" class="meal-input" id="meal-b" placeholder="Breakfast" oninput="saveMeals()">
+            </div>
+            <div class="meal-row">
+                <div class="meal-icon" title="Lunch"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2"></path><path d="M12 21v2"></path><path d="M4.22 4.22l1.42 1.42"></path><path d="M18.36 18.36l1.42 1.42"></path><path d="M1 12h2"></path><path d="M21 12h2"></path><path d="M4.22 19.78l1.42-1.42"></path><path d="M18.36 5.64l1.42-1.42"></path></svg></div>
+                <input type="text" class="meal-input" id="meal-l" placeholder="Lunch" oninput="saveMeals()">
+            </div>
+            <div class="meal-row">
+                <div class="meal-icon" title="Dinner"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div>
+                <input type="text" class="meal-input" id="meal-d" placeholder="Dinner" oninput="saveMeals()">
+            </div>
+            <div class="meal-row">
+                <div class="meal-icon" title="Snack"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M7 9a4.5 4.5 0 1 0 10 0"></path></svg></div>
+                <input type="text" class="meal-input" id="meal-s" placeholder="Snack" oninput="saveMeals()">
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="section">
+            <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>WATER</div>
+            <div class="tracker-box" id="waterContainer"></div>
+        </div>
+        <div class="section">
+            <div class="label"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="6"></rect></svg>VITAMIN</div>
+            <div class="tracker-box" id="vitaminContainer"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M18 2l3 3-3 3"></path><path d="M2 22l3-3 3 3"></path><path d="M10 6h4"></path><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2v20"></path></svg>MOVEMENT
+        </div>
+        <div class="chip-container" id="movementList"></div>
+        <div class="add-input-group">
+            <input type="text" class="add-input" id="newMoveInput" placeholder="운동 추가">
+            <button class="add-btn" onclick="addItem('move')">+</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>ROUTINE
+        </div>
+        <div class="habit-list" id="habitList"></div>
+        <div class="add-input-group">
+            <input type="text" class="add-input" id="newHabitInput" placeholder="루틴 추가">
+            <button class="add-btn" onclick="addItem('habit')">+</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>NOTE</div>
+        <textarea id="noteInput" placeholder="오늘 하루를 마무리하며..."></textarea>
+    </div>
+</div>
+
+<script>
+    const today = new Date();
+    // 날짜별 키 생성 (오늘 날짜에만 데이터 저장/로드)
+    const dateKey = `wellness_meals_${today.toISOString().split('T')[0]}`;
+    // 설정값은 날짜 상관없이 유지
+    const settingsKey = `wellness_config_v2`;
+
+    document.getElementById('dateDisplay').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
+
+    // 1. 설정 불러오기 (항목 리스트)
+    let config = JSON.parse(localStorage.getItem(settingsKey)) || {
+        moveItems: ["Stretching", "Walk", "Yoga"],
+        habitItems: ["Skin Care", "Reading", "No Sugar"]
+    };
+
+    // 2. 오늘 데이터 불러오기 (없으면 초기화)
+    let dailyData = JSON.parse(localStorage.getItem(dateKey)) || {
+        mood: null, 
+        energy: 3, 
+        sleep: 7, 
+        meals: { b: "", l: "", d: "", s: "" }, // 아침,점심,저녁,간식
+        water: 0, 
+        vitamin: 0,
+        moveDone: [], 
+        habitDone: [], 
+        note: ""
+    };
+
+    function saveConfig() { localStorage.setItem(settingsKey, JSON.stringify(config)); }
+    function saveDaily() { localStorage.setItem(dateKey, JSON.stringify(dailyData)); }
+
+    // --- Meals Logic ---
+    const mealInputs = {
+        b: document.getElementById('meal-b'),
+        l: document.getElementById('meal-l'),
+        d: document.getElementById('meal-d'),
+        s: document.getElementById('meal-s')
+    };
+    
+    // Init Meals
+    for(const [key, el] of Object.entries(mealInputs)) {
+        el.value = dailyData.meals[key] || "";
+    }
+
+    function saveMeals() {
+        dailyData.meals.b = mealInputs.b.value;
+        dailyData.meals.l = mealInputs.l.value;
+        dailyData.meals.d = mealInputs.d.value;
+        dailyData.meals.s = mealInputs.s.value;
+        saveDaily();
+    }
+
+    // --- Edit Logic (항목 추가/삭제) ---
+    let isEditing = false;
+    function toggleEditMode() {
+        isEditing = !isEditing;
+        document.body.classList.toggle('editing', isEditing);
+        document.querySelector('.settings-btn').classList.toggle('active', isEditing);
+        renderMovement(); renderHabits();
+    }
+
+    function addItem(type) {
+        const input = document.getElementById(type === 'move' ? 'newMoveInput' : 'newHabitInput');
+        if(!input.value.trim()) return;
+        if(type === 'move') config.moveItems.push(input.value.trim());
+        else config.habitItems.push(input.value.trim());
+        saveConfig(); input.value = '';
+        type === 'move' ? renderMovement() : renderHabits();
+    }
+    function deleteItem(type, name) {
+        if(type === 'move') config.moveItems = config.moveItems.filter(i => i !== name);
+        else config.habitItems = config.habitItems.filter(i => i !== name);
+        saveConfig(); type === 'move' ? renderMovement() : renderHabits();
+    }
+    function editItem(type, oldName) {
+        if(!isEditing) return;
+        const newName = prompt("수정할 이름:", oldName);
+        if(newName && newName !== oldName) {
+            if(type === 'move') {
+                config.moveItems[config.moveItems.indexOf(oldName)] = newName;
+                let idx = dailyData.moveDone.indexOf(oldName); if(idx!==-1) dailyData.moveDone[idx] = newName;
+            } else {
+                config.habitItems[config.habitItems.indexOf(oldName)] = newName;
+                let idx = dailyData.habitDone.indexOf(oldName); if(idx!==-1) dailyData.habitDone[idx] = newName;
             }
-            r /= 255; g /= 255; b /= 255;
-            var max = Math.max(r, g, b), min = Math.min(r, g, b);
-            var h, s, l = (max + min) / 2;
-            if (max == min) { h = s = 0; } 
-            else { 
-                var d = max - min; 
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) { 
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break; 
-                } 
-                h /= 6;
-            } 
-            return [h * 360, s * 100, l * 100]; 
-        };
-        const hslToHex = (h, s, l) => { 
-            h /= 360; s /= 100; l /= 100;
-            var r, g, b; 
-            if (s == 0) { r = g = b = l; } 
-            else { 
-                var hue2rgb = function hue2rgb(p, q, t) {
-                    if (t < 0) t += 1;
-                    if (t > 1) t -= 1;
-                    if (t < 1/6) return p + (q - p) * 6 * t;
-                    if (t < 1/2) return q;
-                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                    return p; 
-                };
-                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                var p = 2 * l - q; 
-                r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1/3); 
-            } 
-            var toHex = function(c) { 
-                var hex = Math.round(c * 255).toString(16);
-                return hex.length == 1 ? "0" + hex : hex; 
-            }; 
-            return "#" + toHex(r) + toHex(g) + toHex(b); 
-        };
-        
-        function updateColorIcon(color) { 
-            const colorIcon = document.getElementById('colorIcon'); 
-            if (colorIcon) colorIcon.style.backgroundColor = color;
+            saveConfig(); saveDaily(); type === 'move' ? renderMovement() : renderHabits();
         }
-        
-        function changeAccentColor(newColor) { 
-            const [h, s, l] = hexToHsl(newColor);
-            const lightAccent = hslToHex(h, s, Math.min(100, l + 20)); 
-            const veryLightColor = hslToHex(h, s, Math.min(100, l + 45));
-            const hoverColor = hslToHex(h, s, Math.min(100, l + 50)); 
-            const separatorColor = hslToHex(h, s, 95); 
-            document.documentElement.style.setProperty('--accent-color', newColor); 
-            document.documentElement.style.setProperty('--light-accent-color', lightAccent);
-            document.documentElement.style.setProperty('--very-light-color', veryLightColor); 
-            document.documentElement.style.setProperty('--hover-color', hoverColor); 
-            document.documentElement.style.setProperty('--separator-color', separatorColor); 
-            localStorage.setItem('accentColor', newColor); 
-            updateColorIcon(newColor); 
-            renderHabits();
-        }
+    }
 
-        /* 3. **수정:** 자동 정렬(sortHabits) 기능 제거 */
-        /* function sortHabits(habits) { ... } */
-        
-        function isHabitDueToday(habit) { 
-            if (habit.frequency === 'daily') return true;
-            if (habit.frequency === 'weekly_days') return habit.days && habit.days.includes(TODAY_DAY); 
-            if (habit.frequency === 'weekly_count') return true; 
-            return false;
-        }
-        function getWeeklyCountProgress(habitId, targetCount) { 
-            const startOfWeek = getStartOfWeek(new Date());
-            let current = new Date(startOfWeek); 
-            let checkedCount = 0; 
-            const today = new Date();
-            while (current <= today) { 
-                const dateKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`; 
-                if (history[dateKey] && history[dateKey][habitId]) checkedCount++;
-                current.setDate(current.getDate() + 1); 
-            } 
-            return `[${checkedCount}/${targetCount}회 목표]`; 
-        }
-        function getFrequencyText(habit) { 
-            if (habit.frequency === 'daily') return '[매일]';
-            if (habit.frequency === 'weekly_days' && habit.days && habit.days.length > 0) { 
-                const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-                const sortedDays = habit.days.sort((a, b) => { 
-                    const normalizedA = a === 0 ? 7 : a; 
-                    const normalizedB = b === 0 ? 7 : b; 
-                    return normalizedA - normalizedB; 
-                }).map(d => dayNames[d]);
-                return `[주 ${habit.days.length}회: ${sortedDays.join(', ')}]`; 
-            } 
-            if (habit.frequency === 'weekly_count') return getWeeklyCountProgress(habit.id, habit.count); 
-            return '[주기 미설정]';
-        }
-        
-        function renderHabits() { 
-            const habitList = document.getElementById('habitList'); 
-            habitList.innerHTML = '';
-            
-            /* 3. **수정:** habits 배열에 저장된 순서 그대로 렌더링 */
-            const habitsToRender = habits; 
-            const todayChecks = history[TODAY_KEY] || {};
-            
-            habitsToRender.forEach(habit => { 
-                const isDue = isHabitDueToday(habit); 
-                const isChecked = todayChecks[habit.id] || false; 
-                const isNotDue = !isDue && habit.frequency !== 'weekly_count'; 
-                
-                const habitItem = document.createElement('div'); 
-                habitItem.className = `habit-item ${isNotDue ? 'not-due' : ''}`; 
-                habitItem.setAttribute('draggable', 'true'); /* 3. 드래그 가능 속성 추가 */
-                habitItem.setAttribute('data-id', habit.id); /* 3. 드래그 식별자 추가 */
-                
-                habitItem.innerHTML = `
-                    <div style="display: flex; align-items: center;">
-                        <div class="checkbox ${isChecked ? 'checked' : ''}" 
-                             onclick="event.stopPropagation(); toggleHabit(${habit.id})" 
-                             ${isNotDue ? 'style="border-style: dashed;"' : ''}></div>
-                    </div>
-                    <div class="habit-editable-area" onclick="openEditHabitModal(${habit.id})">
-                        <div class="habit-info">
-                            <span class="habit-icon">${habit.icon || ''}</span>
-                            <div class="habit-name-group">
-                                <span class="habit-name">${habit.name}</span>
-                                <span class="habit-frequency">${getFrequencyText(habit)}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="delete-btn" onclick="event.stopPropagation(); confirmDelete(${habit.id})" title="삭제">x</button>
-                `; 
-                
-                /* 3. 드래그 앤 드롭 이벤트 리스너 추가 */
-                habitItem.addEventListener('dragstart', handleDragStart);
-                habitItem.addEventListener('dragover', handleDragOver);
-                habitItem.addEventListener('drop', handleDrop);
-                habitItem.addEventListener('dragenter', handleDragEnter);
-                habitItem.addEventListener('dragleave', handleDragLeave);
-                habitList.appendChild(habitItem); 
-            });
-            
-            updateProgress(); 
-            saveState(); 
-        }
+    // --- Render & Toggles ---
+    function renderMovement() {
+        const c = document.getElementById('movementList'); c.innerHTML = '';
+        config.moveItems.forEach(item => {
+            const active = dailyData.moveDone.includes(item);
+            const d = document.createElement('div'); d.className = `chip ${active?'active':''}`;
+            d.innerHTML = `<span>${item}</span><span class="chip-del" onclick="event.stopPropagation();deleteItem('move','${item}')">✕</span>`;
+            d.onclick = () => { if(isEditing) editItem('move', item); else { active ? dailyData.moveDone = dailyData.moveDone.filter(i=>i!==item) : dailyData.moveDone.push(item); saveDaily(); renderMovement(); }};
+            c.appendChild(d);
+        });
+    }
+    function renderHabits() {
+        const c = document.getElementById('habitList'); c.innerHTML = '';
+        config.habitItems.forEach(item => {
+            const active = dailyData.habitDone.includes(item);
+            const d = document.createElement('div'); d.className = `habit-item ${active?'active':''}`;
+            d.innerHTML = `<div class="custom-checkbox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span>${item}</span><button class="habit-del" onclick="event.stopPropagation();deleteItem('habit','${item}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>`;
+            d.onclick = () => { if(isEditing) editItem('habit', item); else { active ? dailyData.habitDone = dailyData.habitDone.filter(i=>i!==item) : dailyData.habitDone.push(item); saveDaily(); renderHabits(); }};
+            c.appendChild(d);
+        });
+    }
 
-        /* 3. **추가:** 드래그 앤 드롭 핸들러 */
-        let draggedHabitId = null;
+    // --- Basic Functions ---
+    const moodBtns = document.querySelectorAll('.mood-btn');
+    function setMood(i) { dailyData.mood = i; updateMood(); saveDaily(); }
+    function updateMood() { moodBtns.forEach((b,i)=>b.classList.toggle('active', i===dailyData.mood)); }
+    
+    const energyContainer = document.getElementById('energyBattery');
+    function toggleEnergy() { dailyData.energy = (dailyData.energy % 5) + 1; updateEnergy(); saveDaily(); }
+    function updateEnergy() { energyContainer.setAttribute('data-level', dailyData.energy); }
 
-        function handleDragStart(e) {
-            draggedHabitId = parseInt(e.currentTarget.getAttribute('data-id'));
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', draggedHabitId);
-            setTimeout(() => e.currentTarget.classList.add('dragging'), 0);
-        }
+    const sleepR = document.getElementById('sleepRange'); const sleepV = document.getElementById('sleepVal');
+    function updateSleep(v) { dailyData.sleep = v; sleepV.innerText = v; saveDaily(); }
 
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            const target = e.currentTarget;
-            if (target.classList.contains('habit-item') && parseInt(target.getAttribute('data-id')) !== draggedHabitId) {
-                // 기존의 drag-over 클래스를 제거하고 현재 대상에 추가
-                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                target.classList.add('drag-over');
-            }
-        }
+    const wCon = document.getElementById('waterContainer'); const vCon = document.getElementById('vitaminContainer');
+    const wSvg = '<svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>';
+    const pSvg = '<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="6"></rect><line x1="12" y1="6" x2="12" y2="18"></line></svg>';
+    for(let i=0;i<6;i++){ const b=document.createElement('button'); b.className='drop-btn'; b.innerHTML=wSvg; b.onclick=()=>{ dailyData.water=(dailyData.water===i+1)?i:i+1; updateWater(); saveDaily(); }; wCon.appendChild(b); }
+    function updateWater(){ document.querySelectorAll('.drop-btn').forEach((b,i)=>b.classList.toggle('active', i<dailyData.water)); }
+    for(let i=0;i<3;i++){ const b=document.createElement('button'); b.className='pill-btn'; b.innerHTML=pSvg; b.onclick=()=>{ dailyData.vitamin=(dailyData.vitamin===i+1)?i:i+1; updateVit(); saveDaily(); }; vCon.appendChild(b); }
+    function updateVit(){ document.querySelectorAll('.pill-btn').forEach((b,i)=>b.classList.toggle('active', i<dailyData.vitamin)); }
 
-        function handleDragEnter(e) {
-            e.preventDefault();
-        }
+    const note = document.getElementById('noteInput');
+    note.addEventListener('input', (e)=>{ dailyData.note=e.target.value; saveDaily(); });
 
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('drag-over');
-        }
+    // Init Load
+    updateMood(); updateEnergy(); sleepR.value=dailyData.sleep; sleepV.innerText=dailyData.sleep;
+    updateWater(); updateVit(); renderMovement(); renderHabits(); note.value=dailyData.note;
 
-        function handleDrop(e) {
-            e.preventDefault();
-            const target = e.currentTarget;
-            const targetId = parseInt(target.getAttribute('data-id'));
-            
-            // 모든 드래그 관련 클래스 제거
-            document.querySelectorAll('.dragging, .drag-over').forEach(el => el.classList.remove('dragging', 'drag-over'));
-            
-            if (draggedHabitId === targetId) return;
-
-            const sourceIndex = habits.findIndex(h => h.id === draggedHabitId);
-            const targetIndex = habits.findIndex(h => h.id === targetId);
-
-            if (sourceIndex > -1 && targetIndex > -1) {
-                // 배열에서 습관을 이동
-                const [movedHabit] = habits.splice(sourceIndex, 1);
-                habits.splice(targetIndex, 0, movedHabit);
-                
-                // 새로운 순서로 리렌더링
-                renderHabits();
-            }
-            draggedHabitId = null;
-        }
-
-        function toggleHabit(id) { 
-            const habit = habits.find(h => h.id === id);
-            if (!habit) return; 
-            if (habit.frequency === 'weekly_days' && !isHabitDueToday(habit)) return; 
-            const isChecked = !(history[TODAY_KEY] && history[TODAY_KEY][id]); 
-            history[TODAY_KEY] = history[TODAY_KEY] || {}; 
-            history[TODAY_KEY][id] = isChecked; 
-            renderHabits(); 
-        }
-        function updateProgress() { 
-            const dailyDueHabits = habits.filter(h => h.frequency === 'daily' || (h.frequency === 'weekly_days' && isHabitDueToday(h)));
-            const totalDueItems = dailyDueHabits.length; 
-            if (totalDueItems === 0) { 
-                document.getElementById('progressText').textContent = '습관을 추가하여 오늘 목표를 설정해보세요.'; 
-                document.getElementById('progressBar').style.width = '0%'; 
-                return;
-            } 
-            const todayChecks = history[TODAY_KEY] || {}; 
-            const checkedItems = dailyDueHabits.filter(h => todayChecks[h.id]).length; 
-            let percentage = totalDueItems > 0 ? Math.round((checkedItems / totalDueItems) * 100) : 0; 
-            setTimeout(() => { 
-                document.getElementById('progressBar').style.width = percentage + '%'; 
-            }, 0);
-            document.getElementById('progressText').textContent = `오늘 달성률: ${percentage}% (${checkedItems}/${totalDueItems})`; 
-        }
-
-        let selectedDays = [];
-        function toggleFrequencyOptions() { 
-            const frequency = document.querySelector('#habitFormModal #frequencySelect').value; 
-            const daySelector = document.querySelector('#habitFormModal #daySelector'); 
-            const countSelector = document.querySelector('#habitFormModal #countSelector');
-            daySelector.style.display = 'none'; 
-            countSelector.style.display = 'none'; 
-            if (frequency === 'weekly_days') daySelector.style.display = 'flex';
-            else if (frequency === 'weekly_count') countSelector.style.display = 'flex'; 
-        }
-        function setupDaySelector(initialDays) { 
-            initialDays = initialDays || []; 
-            const daySelector = document.querySelector('#habitFormModal #daySelector'); 
-            if (!daySelector) return; 
-            selectedDays = initialDays.slice();
-            daySelector.querySelectorAll('button').forEach(button => { 
-                const day = parseInt(button.getAttribute('data-day')); 
-                button.classList.remove('selected'); 
-                if (selectedDays.includes(day)) button.classList.add('selected'); 
-                button.onclick = function() { 
-                    const index = selectedDays.indexOf(day); 
-                    if (index > -1) { 
-                        selectedDays.splice(index, 1); 
-                        this.classList.remove('selected'); 
-                    } else { 
-                        selectedDays.push(day); 
-                        this.classList.add('selected'); 
-                    } 
-                }; 
-            });
-        }
-        function openEditHabitModal(id) { 
-            const habit = habits.find(h => h.id === id);
-            if (!habit) return; 
-            currentHabitId = id; 
-            document.getElementById('habitFormTitle').textContent = '습관 편집'; 
-            document.getElementById('habitNameInput').value = habit.name; 
-            document.getElementById('frequencySelect').value = habit.frequency; 
-            document.getElementById('weeklyCountInput').value = habit.count || 1; 
-            setupDaySelector(habit.days); 
-            toggleFrequencyOptions(); 
-            document.getElementById('habitFormModal').classList.add('open'); 
-        }
-        function openAddHabitModal() { 
-            currentHabitId = null;
-            document.getElementById('habitFormTitle').textContent = '새 습관 추가'; 
-            document.getElementById('habitNameInput').value = ''; 
-            document.getElementById('frequencySelect').value = 'daily'; 
-            document.getElementById('weeklyCountInput').value = 3; 
-            setupDaySelector([]); 
-            toggleFrequencyOptions(); 
-            document.getElementById('habitFormModal').classList.add('open');
-        }
-        function closeHabitFormModal() { 
-            document.getElementById('habitFormModal').classList.remove('open'); 
-            currentHabitId = null;
-        }
-        function saveHabit() { 
-            const name = document.getElementById('habitNameInput').value.trim(); 
-            const frequency = document.getElementById('frequencySelect').value;
-            const weeklyCountInput = document.getElementById('weeklyCountInput'); 
-            if (!name) { 
-                alert('습관 이름을 입력해주세요!'); 
-                return; 
-            } 
-            let days = []; 
-            let count = 0;
-            if (frequency === 'weekly_days') { 
-                if (selectedDays.length === 0) { 
-                    alert('주간 특정 요일 습관은 요일을 최소 1개 이상 선택해야 합니다.');
-                    return; 
-                } 
-                days = selectedDays.slice(); 
-            } else if (frequency === 'weekly_count') { 
-                count = parseInt(weeklyCountInput.value);
-                if (isNaN(count) || count < 1 || count > 7) { 
-                    alert('주간 횟수는 1회부터 7회 사이로 설정해야 합니다.'); 
-                    return;
-                } 
-            } 
-            if (currentHabitId !== null) { 
-                const habitIndex = habits.findIndex(h => h.id === currentHabitId);
-                if (habitIndex > -1) { 
-                    habits[habitIndex] = { 
-                        ...habits[habitIndex], 
-                        name: name, 
-                        frequency: frequency, 
-                        days: days, 
-                        count: count 
-                    };
-                } 
-            } else { 
-                const newHabit = { 
-                    id: nextId++, 
-                    icon: '', 
-                    name: name, 
-                    frequency: frequency, 
-                    days: days, 
-                    count: count 
-                };
-                habits.push(newHabit); 
-            } 
-            closeHabitFormModal(); 
-            renderHabits(); 
-        }
-        function confirmDelete(id) { 
-            openConfirmModal('정말로 이 습관을 삭제하시겠습니까? 기록도 삭제됩니다.', () => { 
-                habits = habits.filter(h => h.id !== id); 
-                for (const date in history) { 
-                    if (history[date][id] !== undefined) { 
-                        delete history[date][id]; 
-                    } 
-                } 
-                renderHabits(); 
-            });
-        }
-        let pendingAction = null;
-        function openConfirmModal(message, actionCallback) { 
-            document.getElementById('confirmMessage').textContent = message.replace(/<br>/g, '');
-            document.getElementById('confirmModal').style.display = 'block'; 
-            pendingAction = actionCallback; 
-            document.getElementById('confirmYesBtn').onclick = () => { 
-                pendingAction(); 
-                closeConfirmModal(); 
-            };
-        }
-        function closeConfirmModal() { 
-            document.getElementById('confirmModal').style.display = 'none'; 
-            pendingAction = null;
-        }
-        function alert(message) { 
-            window.alert(message);
-        }
-        
-        window.onload = function() { 
-            document.getElementById('todayDateHeader').textContent = `오늘: ${TODAY_KEY}`; 
-            const colorPicker = document.querySelector('#colorPicker');
-            const savedColor = localStorage.getItem('accentColor') || colorPicker.value; 
-            colorPicker.value = savedColor; 
-            changeAccentColor(savedColor); 
-            colorPicker.addEventListener('input', (e) => { 
-                changeAccentColor(e.target.value); 
-            });
-            colorPicker.addEventListener('change', (e) => { 
-                changeAccentColor(e.target.value); 
-            }); 
-            renderHabits(); 
-        };
-    </script>
+</script>
 </body>
 </html>
