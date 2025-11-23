@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness Compact</title>
+    <title>Fixed Wellness Widget</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Montserrat:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Montserrat:wght@400;600&display=swap');
 
         :root {
             --bg: #fffcfc;
@@ -17,137 +17,146 @@
             --text-light: #a89999;
             --danger: #e57373;
             --success: #a4cfa4;
-            --border-radius: 12px; /* 둥글기 약간 축소 */
+            --radius: 12px;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0; padding: 10px; /* 전체 여백 축소 */
+            margin: 0; padding: 0;
             font-family: 'Montserrat', 'Gowun Dodum', sans-serif;
             background-color: transparent;
             color: var(--text);
+            /* 중앙 정렬: 창이 넓어도 위젯은 가운데에 위치 */
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* 위쪽 정렬로 변경 */
+            justify-content: center; 
+            align-items: flex-start;
             min-height: 100vh;
         }
 
         .container {
             width: 100%;
-            max-width: 100%;
-            /* 내부 여백 대폭 축소 */
-            padding: 1rem; 
+            /* 핵심 수정: 최대 너비를 280px로 제한 */
+            max-width: 280px; 
+            padding: 0.8rem; 
             display: flex;
             flex-direction: column;
-            gap: 1rem; /* 섹션 간 간격 축소 */
+            gap: 0.8rem;
             background: var(--card);
-            border-radius: var(--border-radius);
+            margin: 0 auto; /* 좌우 자동 정렬 */
         }
 
-        /* --- Header --- */
+        /* --- Typography & Header --- */
         header {
             display: flex; justify-content: space-between; align-items: flex-end;
-            padding-bottom: 8px; border-bottom: 1px solid var(--primary-soft);
-            margin-bottom: -5px; /* 헤더 아래 간격 줄임 */
+            padding-bottom: 6px; border-bottom: 1px solid var(--primary-soft);
         }
-        .header-left h1 { font-size: 1rem; font-weight: 700; margin: 0; color: var(--accent); letter-spacing: -0.5px; }
-        .date { font-size: 0.75rem; color: var(--text-light); }
-        .settings-btn { padding: 2px; color: var(--text-light); transition: 0.3s; cursor: pointer; background: none; border: none; }
-        .settings-btn svg { width: 16px; height: 16px; }
-        .settings-btn:hover { color: var(--accent); transform: rotate(30deg); }
-        .settings-btn.active { color: var(--accent); transform: rotate(180deg); }
+        .header-left h1 { font-size: 0.9rem; font-weight: 700; margin: 0; color: var(--accent); letter-spacing: -0.5px; }
+        .date { font-size: 0.65rem; color: var(--text-light); margin-top: 2px; }
         
-        .edit-notice { font-size: 0.7rem; color: var(--accent); text-align: center; background: var(--primary-soft); padding: 2px; border-radius: 4px; display: none; margin-top: -5px; }
+        .settings-btn { 
+            padding: 0; background: none; border: none; cursor: pointer; color: var(--text-light); 
+            width: 16px; height: 16px;
+        }
+        .settings-btn svg { width: 14px; height: 14px; stroke-width: 2; }
+        .edit-notice { font-size: 0.6rem; color: var(--accent); text-align: center; background: var(--primary-soft); border-radius: 4px; display: none; margin-top: -4px; padding: 2px 0;}
         body.editing .edit-notice { display: block; }
 
         /* --- Section Common --- */
-        .section { display: flex; flex-direction: column; gap: 0.5rem; } /* 라벨과 내용 사이 간격 축소 */
-        .label { font-size: 0.75rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .icon { width: 14px; height: 14px; stroke: var(--text); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .section { display: flex; flex-direction: column; gap: 4px; }
+        .label { 
+            font-size: 0.65rem; font-weight: 600; color: var(--text); 
+            display: flex; align-items: center; gap: 4px; 
+            text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.9;
+        }
+        .icon { width: 12px; height: 12px; stroke: var(--text); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .label .icon { stroke: var(--primary); }
 
         /* --- 1. Mood --- */
-        .mood-container { display: flex; justify-content: space-between; background: var(--primary-soft); padding: 6px 10px; border-radius: var(--border-radius); }
-        .mood-btn { background: none; border: none; cursor: pointer; padding: 2px; opacity: 0.5; transition: 0.2s; }
-        .mood-btn svg { width: 22px; height: 22px; stroke: var(--text); } /* 아이콘 크기 축소 */
-        .mood-btn.active { opacity: 1; transform: scale(1.1); }
-        .mood-btn.active svg { stroke: var(--accent); fill: rgba(255,255,255,0.5); }
+        .mood-container { 
+            display: flex; justify-content: space-between; 
+            background: var(--primary-soft); padding: 6px 8px; border-radius: var(--radius); 
+        }
+        .mood-btn { background: none; border: none; cursor: pointer; padding: 0; opacity: 0.4; transition: 0.2s; }
+        .mood-btn svg { width: 18px; height: 18px; stroke: var(--text); stroke-width: 1.5; }
+        .mood-btn.active { opacity: 1; transform: scale(1.15); }
+        .mood-btn.active svg { stroke: var(--accent); fill: rgba(255,255,255,0.6); }
 
-        /* --- 2. Energy & Sleep (Grid) --- */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-        
-        /* Energy Battery */
-        .battery-container { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-        .battery-shell { width: 100%; height: 24px; border: 1.5px solid var(--primary-soft); border-radius: 6px; padding: 2px; position: relative; display: flex; align-items: center; gap: 2px; }
-        .battery-shell::after { content: ''; position: absolute; right: -4px; top: 6px; bottom: 6px; width: 3px; background: var(--primary-soft); border-radius: 0 2px 2px 0; }
-        .battery-level { flex: 1; height: 100%; background: var(--primary-soft); border-radius: 2px; transition: background 0.3s ease; }
+        /* --- 2. Energy & Sleep (Side by Side) --- */
+        .split-row { display: flex; gap: 8px; }
+        .split-item { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+        .battery-container { display: flex; align-items: center; gap: 4px; cursor: pointer; margin-top: 2px;}
+        .battery-shell { 
+            width: 100%; height: 18px; 
+            border: 1px solid var(--primary-soft); border-radius: 4px; 
+            padding: 1px; position: relative; display: flex; align-items: center; gap: 1px; 
+        }
+        .battery-shell::after { content: ''; position: absolute; right: -3px; top: 4px; bottom: 4px; width: 2px; background: var(--primary-soft); border-radius: 0 2px 2px 0; }
+        .battery-level { flex: 1; height: 100%; background: var(--primary-soft); border-radius: 1px; }
         .battery-container[data-level="1"] .battery-level:nth-child(1) { background: var(--danger); }
         .battery-container[data-level="2"] .battery-level:nth-child(-n+2) { background: #ffb74d; }
         .battery-container[data-level="3"] .battery-level:nth-child(-n+3) { background: #ffd54f; }
         .battery-container[data-level="4"] .battery-level:nth-child(-n+4) { background: #aed581; }
         .battery-container[data-level="5"] .battery-level:nth-child(-n+5) { background: var(--success); }
-        .energy-text { font-size: 0.7rem; font-weight: 600; color: var(--accent); min-width: 25px; text-align: right; }
+        .val-text { font-size: 0.65rem; font-weight: 600; color: var(--accent); text-align: right; min-width: 20px;}
 
-        /* Sleep Slider */
-        .sleep-wrapper { display: flex; align-items: center; gap: 8px; }
-        input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; }
+        .sleep-wrapper { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+        input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; margin: 0;}
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: var(--primary-soft); border-radius: 10px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--primary); margin-top: -5px; cursor: pointer; transition: 0.2s; }
-        .sleep-value { font-size: 0.75rem; font-weight: 600; color: var(--accent); min-width: 30px; text-align: right; }
-
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: var(--primary); margin-top: -4px; cursor: pointer; }
+        
         /* --- 3. Meals --- */
-        .meal-list { display: flex; flex-direction: column; gap: 6px; } /* 간격 축소 */
-        .meal-row { display: flex; align-items: center; gap: 8px; }
-        .meal-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; color: var(--text-light); }
-        .meal-icon svg { width: 16px; height: 16px; stroke: var(--primary); stroke-width: 1.5; }
+        .meal-list { display: flex; flex-direction: column; gap: 4px; }
+        .meal-row { display: flex; align-items: center; gap: 6px; }
+        .meal-icon { width: 16px; display: flex; justify-content: center; }
+        .meal-icon svg { width: 14px; height: 14px; stroke: var(--text-light); stroke-width: 1.5; }
         .meal-input {
-            flex: 1; border: none; border-bottom: 1px solid var(--primary-soft);
-            background: transparent; padding: 3px 0; font-family: inherit; font-size: 0.75rem; color: var(--text); /* 폰트 축소 */
-            outline: none; transition: border-color 0.2s;
+            flex: 1; width: 100%; border: none; border-bottom: 1px solid var(--primary-soft);
+            background: transparent; padding: 2px 0; font-family: inherit; font-size: 0.7rem; color: var(--text);
+            outline: none; 
         }
-        .meal-input:focus { border-bottom-color: var(--accent); }
-        .meal-input::placeholder { color: #e0d4d4; font-size: 0.7rem; }
+        .meal-input::placeholder { color: #e0d4d4; font-size: 0.65rem; }
 
         /* --- 4. Water & Vitamin --- */
-        .tracker-box { display: flex; gap: 3px; flex-wrap: wrap; }
-        .drop-btn, .pill-btn { background: none; border: none; cursor: pointer; padding: 0; opacity: 0.3; transition: 0.2s; }
-        .drop-btn svg, .pill-btn svg { stroke: var(--primary); fill: none; width: 16px; height: 16px; } /* 아이콘 축소 */
+        .tracker-box { display: flex; gap: 2px; flex-wrap: wrap; }
+        .drop-btn, .pill-btn { padding: 0; border: none; background: none; cursor: pointer; opacity: 0.3; }
+        .drop-btn svg, .pill-btn svg { width: 14px; height: 14px; stroke: var(--primary); fill: none; }
         .drop-btn.active, .pill-btn.active { opacity: 1; transform: scale(1.1); }
         .drop-btn.active svg, .pill-btn.active svg { fill: var(--primary); }
 
-        /* --- 5. Movement & Routine (Chips & List) --- */
-        .chip-container { display: flex; gap: 6px; flex-wrap: wrap; }
-        .chip { padding: 4px 10px; border: 1px solid var(--primary-soft); border-radius: 14px; font-size: 0.7rem; cursor: pointer; color: var(--text-light); background: transparent; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
-        .chip:hover { border-color: var(--primary); }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 500; }
+        /* --- 5. Movement & Routine --- */
+        .chip-container { display: flex; gap: 4px; flex-wrap: wrap; }
+        .chip { 
+            padding: 3px 8px; border: 1px solid var(--primary-soft); border-radius: 12px; 
+            font-size: 0.65rem; cursor: pointer; color: var(--text-light); background: transparent; 
+            display: flex; align-items: center; gap: 3px;
+        }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        .habit-list { display: flex; flex-direction: column; gap: 4px; }
-        .habit-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.75rem; color: var(--text); padding: 2px 0; }
-        .custom-checkbox { width: 14px; height: 14px; border: 1.5px solid var(--primary); border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .custom-checkbox svg { width: 10px; height: 10px; stroke: white; opacity: 0; transition: 0.2s; }
+        .habit-list { display: flex; flex-direction: column; gap: 3px; }
+        .habit-item { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.7rem; padding: 1px 0; }
+        .custom-checkbox { width: 12px; height: 12px; border: 1.5px solid var(--primary); border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
+        .custom-checkbox svg { width: 8px; height: 8px; stroke: white; opacity: 0; }
         .habit-item.active .custom-checkbox { background: var(--primary); }
         .habit-item.active .custom-checkbox svg { opacity: 1; }
         .habit-item.active span { color: var(--text-light); text-decoration: line-through; }
-        
-        /* Delete Buttons */
-        .chip-del { display: none; width: 12px; height: 12px; background: #fff; color: var(--danger); border-radius: 50%; font-size: 9px; line-height: 12px; text-align: center; }
-        .habit-del { margin-left: auto; color: var(--danger); opacity: 0; pointer-events: none; background: none; border: none; cursor: pointer; padding: 0; }
-        .habit-del svg { width: 14px; height: 14px; stroke: var(--danger); }
-        
-        body.editing .chip { border-style: dashed; border-color: var(--accent); color: var(--text); background: #fff !important; }
-        body.editing .chip-del { display: inline-block; }
-        body.editing .habit-item { border-bottom: 1px dashed var(--primary-soft); }
-        body.editing .habit-del { opacity: 1; pointer-events: auto; }
-        body.editing .habit-item span { text-decoration: none !important; color: var(--text) !important; }
 
-        .add-input-group { display: none; gap: 6px; margin-top: 2px; }
+        .chip-del { display: none; width: 10px; height: 10px; background: white; color: var(--danger); border-radius: 50%; font-size: 8px; line-height: 10px; text-align: center; }
+        .habit-del { margin-left: auto; background: none; border: none; color: var(--danger); opacity: 0; pointer-events: none; padding: 0; }
+        .habit-del svg { width: 12px; height: 12px; }
+        body.editing .chip-del { display: inline-block; }
+        body.editing .habit-del { opacity: 1; pointer-events: auto; }
+        body.editing .habit-item { border-bottom: 1px dashed var(--primary-soft); }
+        body.editing .habit-item span { text-decoration: none !important; }
+
+        .add-input-group { display: none; gap: 4px; margin-top: 2px; }
         body.editing .add-input-group { display: flex; }
-        .add-input { flex: 1; border: none; border-bottom: 1px solid var(--text-light); background: transparent; padding: 2px; font-family: inherit; font-size: 0.75rem; outline: none; }
-        .add-btn { background: var(--primary); color: white; border: none; border-radius: 4px; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .add-input { flex: 1; border: none; border-bottom: 1px solid var(--text-light); background: transparent; padding: 2px; font-size: 0.7rem; outline: none; }
+        .add-btn { background: var(--primary); color: white; border: none; border-radius: 3px; width: 16px; height: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; }
 
         /* --- 6. Note --- */
-        textarea { width: 100%; height: 50px; border: 1px solid var(--primary-soft); background: #fafafa; border-radius: 10px; padding: 8px; font-family: inherit; font-size: 0.75rem; resize: none; outline: none; color: var(--text); }
+        textarea { width: 100%; height: 40px; border: 1px solid var(--primary-soft); background: #fafafa; border-radius: 8px; padding: 6px; font-family: inherit; font-size: 0.7rem; resize: none; outline: none; color: var(--text); }
         textarea:focus { border-color: var(--primary); background: white; }
 
     </style>
@@ -157,11 +166,11 @@
 <div class="container">
     <header>
         <div class="header-left">
-            <h1>WELLNESS LOG</h1>
+            <h1>DAILY LOG</h1>
             <div class="date" id="dateDisplay">...</div>
         </div>
         <button class="settings-btn" onclick="toggleEditMode()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
     </header>
     <div class="edit-notice">편집모드: 수정/삭제/추가</div>
@@ -177,34 +186,43 @@
         </div>
     </div>
 
-    <div class="grid-2">
-        <div class="section">
+    <div class="split-row">
+        <div class="split-item">
             <div class="label"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M13 2L11 7h4L13 12"></path></svg>ENERGY</div>
             <div class="battery-container" id="energyBattery" onclick="toggleEnergy()" data-level="3">
-                <div class="battery-shell">
-                    <div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div>
-                </div>
-                <div class="energy-text" id="energyText">Mid</div>
+                <div class="battery-shell"><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div><div class="battery-level"></div></div>
+                <div class="val-text" id="energyText">Mid</div>
             </div>
         </div>
-        <div class="section">
+        <div class="split-item">
             <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>SLEEP</div>
             <div class="sleep-wrapper">
                 <input type="range" min="0" max="12" step="0.5" id="sleepRange" oninput="updateSleep(this.value)">
-                <div class="sleep-value"><span id="sleepVal">7</span>h</div>
+                <div class="val-text"><span id="sleepVal">7</span>h</div>
             </div>
         </div>
     </div>
 
+    <div class="split-row">
+        <div class="split-item">
+            <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>WATER</div>
+            <div class="tracker-box" id="waterContainer"></div>
+        </div>
+        <div class="split-item">
+            <div class="label"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="6"></rect></svg>VITAMIN</div>
+            <div class="tracker-box" id="vitaminContainer"></div>
+        </div>
+    </div>
+
     <div class="section">
-        <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>MEALS</div>
+        <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>MEALS</div>
         <div class="meal-list">
             <div class="meal-row">
-                <div class="meal-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.91 11.63c1.23.63 2.09 1.92 2.09 3.37 0 2.21-1.79 4-4 4s-4-1.79-4-4c0-1.45.86-2.74 2.09-3.37"></path><path d="M9 12H7l-2 3h5"></path><path d="M12 12v-2"></path></svg></div>
+                <div class="meal-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="M9 12H7l-2 3h5"></path><path d="M12 12v-2"></path></svg></div>
                 <input type="text" class="meal-input" id="meal-b" placeholder="Breakfast" oninput="saveMeals()">
             </div>
             <div class="meal-row">
-                <div class="meal-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2"></path><path d="M12 21v2"></path><path d="M4.22 4.22l1.42 1.42"></path><path d="M18.36 18.36l1.42 1.42"></path><path d="M1 12h2"></path><path d="M21 12h2"></path><path d="M4.22 19.78l1.42-1.42"></path><path d="M18.36 5.64l1.42-1.42"></path></svg></div>
+                <div class="meal-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2"></path><path d="M12 21v2"></path><path d="M4.22 4.22l1.42 1.42"></path></svg></div>
                 <input type="text" class="meal-input" id="meal-l" placeholder="Lunch" oninput="saveMeals()">
             </div>
             <div class="meal-row">
@@ -218,22 +236,11 @@
         </div>
     </div>
 
-    <div class="grid-2">
-        <div class="section">
-            <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>WATER</div>
-            <div class="tracker-box" id="waterContainer"></div>
-        </div>
-        <div class="section">
-            <div class="label"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="6"></rect></svg>VITAMIN</div>
-            <div class="tracker-box" id="vitaminContainer"></div>
-        </div>
-    </div>
-
     <div class="section">
-        <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M18 2l3 3-3 3"></path><path d="M2 22l3-3 3 3"></path><path d="M10 6h4"></path><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2v20"></path></svg>MOVE</div>
+        <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M18 2l3 3-3 3"></path><path d="M2 22l3-3 3 3"></path><path d="M10 6h4"></path><line x1="2" y1="12" x2="22" y2="12"></line></svg>MOVE</div>
         <div class="chip-container" id="movementList"></div>
         <div class="add-input-group">
-            <input type="text" class="add-input" id="newMoveInput" placeholder="운동 추가">
+            <input type="text" class="add-input" id="newMoveInput" placeholder="Add...">
             <button class="add-btn" onclick="addItem('move')">+</button>
         </div>
     </div>
@@ -242,30 +249,29 @@
         <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>ROUTINE</div>
         <div class="habit-list" id="habitList"></div>
         <div class="add-input-group">
-            <input type="text" class="add-input" id="newHabitInput" placeholder="루틴 추가">
+            <input type="text" class="add-input" id="newHabitInput" placeholder="Add...">
             <button class="add-btn" onclick="addItem('habit')">+</button>
         </div>
     </div>
 
     <div class="section">
         <div class="label"><svg class="icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>NOTE</div>
-        <textarea id="noteInput" placeholder="마무리..."></textarea>
+        <textarea id="noteInput" placeholder="Memo..."></textarea>
     </div>
 
 </div>
 
 <script>
     const today = new Date();
-    const dateKey = `wellness_cmp_${today.toISOString().split('T')[0]}`;
-    const settingsKey = `wellness_config_cmp`;
+    const dateKey = `wellness_fixed_${today.toISOString().split('T')[0]}`;
+    const settingsKey = `wellness_config_fixed`;
 
-    document.getElementById('dateDisplay').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    document.getElementById('dateDisplay').innerText = today.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
 
     let config = JSON.parse(localStorage.getItem(settingsKey)) || {
-        moveItems: ["Stretching", "Walk", "Yoga"],
-        habitItems: ["Skin Care", "Reading", "No Sugar"]
+        moveItems: ["Stretch", "Walk", "Yoga"],
+        habitItems: ["SkinCare", "Reading"]
     };
-
     let dailyData = JSON.parse(localStorage.getItem(dateKey)) || {
         mood: null, energy: 3, sleep: 7, meals: { b: "", l: "", d: "", s: "" },
         water: 0, vitamin: 0, moveDone: [], habitDone: [], note: ""
@@ -274,12 +280,10 @@
     function saveConfig() { localStorage.setItem(settingsKey, JSON.stringify(config)); }
     function saveDaily() { localStorage.setItem(dateKey, JSON.stringify(dailyData)); }
 
-    // Meals
     const mealInputs = { b: document.getElementById('meal-b'), l: document.getElementById('meal-l'), d: document.getElementById('meal-d'), s: document.getElementById('meal-s') };
     for(const [k, el] of Object.entries(mealInputs)) el.value = dailyData.meals[k] || "";
     function saveMeals() { for(const [k, el] of Object.entries(mealInputs)) dailyData.meals[k]=el.value; saveDaily(); }
 
-    // Editing
     let isEditing = false;
     function toggleEditMode() {
         isEditing = !isEditing;
@@ -299,7 +303,7 @@
     }
     function editItem(type, oldName) {
         if(!isEditing) return;
-        const newName = prompt("수정:", oldName);
+        const newName = prompt("Edit:", oldName);
         if(newName && newName!==oldName) {
             if(type==='move') { config.moveItems[config.moveItems.indexOf(oldName)]=newName; let idx=dailyData.moveDone.indexOf(oldName); if(idx!==-1) dailyData.moveDone[idx]=newName; }
             else { config.habitItems[config.habitItems.indexOf(oldName)]=newName; let idx=dailyData.habitDone.indexOf(oldName); if(idx!==-1) dailyData.habitDone[idx]=newName; }
@@ -307,7 +311,6 @@
         }
     }
 
-    // Render
     function renderMovement() {
         const c = document.getElementById('movementList'); c.innerHTML = '';
         config.moveItems.forEach(item => {
@@ -329,14 +332,13 @@
         });
     }
 
-    // Core
     const moodBtns = document.querySelectorAll('.mood-btn');
     function setMood(i) { dailyData.mood = i; updateMood(); saveDaily(); }
     function updateMood() { moodBtns.forEach((b,i)=>b.classList.toggle('active', i===dailyData.mood)); }
     
     const energyContainer = document.getElementById('energyBattery');
     const energyText = document.getElementById('energyText');
-    const labels = ["Low","Low","Mid","High","Full"];
+    const labels = ["Lo","Lo","Mid","Hi","Full"];
     function toggleEnergy() { dailyData.energy = (dailyData.energy % 5) + 1; updateEnergy(); saveDaily(); }
     function updateEnergy() { energyContainer.setAttribute('data-level', dailyData.energy); energyText.innerText = labels[dailyData.energy-1]; }
 
@@ -354,10 +356,8 @@
     const note = document.getElementById('noteInput');
     note.addEventListener('input', (e)=>{ dailyData.note=e.target.value; saveDaily(); });
 
-    // Init
     updateMood(); updateEnergy(); sleepR.value=dailyData.sleep; sleepV.innerText=dailyData.sleep;
     updateWater(); updateVit(); renderMovement(); renderHabits(); note.value=dailyData.note;
-
 </script>
 </body>
 </html>
